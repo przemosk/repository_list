@@ -34,13 +34,17 @@ public class GithubServiceImpl implements GithubService {
     public List<Branch> getUserBranchRepositories(String username, String branch_name) {
         var fullURL = baseURL + "/repos/" + username + "/" + branch_name + "/branches";
 
-        ResponseEntity<List<Branch>> branchResponseEntity = restTemplate.exchange(
-                fullURL,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Branch>>() {
-                });
+        try {
+            ResponseEntity<List<Branch>> branchResponseEntity = restTemplate.exchange(
+                    fullURL,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<Branch>>() {
+                    });
 
-        return branchResponseEntity.getBody();
+            return branchResponseEntity.getBody();
+        } catch (HttpClientErrorException exception) {
+            throw new RepositoryHandleException(exception.getMessage(), exception.getStatusCode().value());
+        }
     }
 }
